@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frankenstein E-Waste Upcycler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* The Vibe: Deep Cyber-Lab */
+            --bg-deep: #050a08;
+            --surface-glass: rgba(18, 28, 23, 0.65);
+            --surface-solid: #121c17;
+            --border-subtle: rgba(74, 222, 128, 0.15);
+            
+            /* The Spark */
+            --neon-green: #4ade80;
+            --neon-glow: rgba(74, 222, 128, 0.3);
+            --neon-dim: rgba(74, 222, 128, 0.1);
+            
+            /* Classifications */
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            
+            /* Text */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #0a1711, var(--bg-deep)), var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            /* Faint CRT/Lab grid */
+            background-image: linear-gradient(var(--border-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            position: relative;
+            padding-bottom: 80px; /* Space for vault button */
+        }
+
+        /* Typography */
+        h1, h2, h3 { font-weight: 600; margin-top: 0; }
+        .tech-font { font-family: 'Space Mono', monospace; }
+        .text-sm { font-size: 0.875rem; color: var(--text-muted); }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Top Header */
+        .header-card {
+            background: linear-gradient(135deg, rgba(20, 40, 30, 0.8), rgba(10, 20, 15, 0.8));
+            border-bottom: 2px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 25px var(--neon-glow);
+        }
+
+        /* Form Inputs */
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--neon-green);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            background: rgba(74, 222, 128, 0.05);
+            box-shadow: 0 0 15px var(--neon-dim);
+        }
+
+        /* Visual Data Upload Box */
+        .upload-zone {
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+        .upload-zone:hover {
+            border-color: var(--neon-green);
+            background: var(--neon-dim);
+            color: var(--neon-green);
+        }
+
+        /* Tool Chips */
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .tool-chip {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tool-chip:hover, .tool-chip.active {
+            background: var(--neon-dim);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* Skill Slider */
+        .slider-container { margin-top: 2rem; }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--neon-green);
+            cursor: pointer;
+        }
+
+        /* Main Action Button */
+        .btn-primary {
+            width: 100%;
+            background: var(--neon-green);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px var(--neon-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
+            background: #5cff95;
+        }
+
+        /* Vault System */
+        .vault-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface-solid);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        .vault-fab:hover { background: var(--neon-dim); }
+        .vault-badge {
+            background: var(--neon-green);
+            color: #000;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Vault Sidebar */
+        .vault-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 350px;
+            height: 100vh;
+            background: var(--surface-solid);
+            border-left: 1px solid var(--border-subtle);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 99;
+            padding: 2rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .vault-sidebar.open { right: 0; }
+        .vault-close { cursor: pointer; color: var(--text-muted); float: right; }
+        
+        .vault-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Classification Results Styling */
+        .classification-card {
+            border-left: 4px solid var(--border-color);
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-small {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-small:hover { background: var(--neon-green); color: #000; }
+
+        /* Loader */
+        .loader-container {
+            display: none; text-align: center; padding: 4rem 0;
+        }
+        .cyber-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem auto;
+            box-shadow: 0 0 20px var(--neon-dim);
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* View toggling */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="header-card">
+        <div>
+            <h1>Frankenstein E-Waste Upcycler</h1>
+            <div class="text-sm tech-font">Intelligent Triage & Combinatorial Upcycling Engine</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 50%; cursor:pointer;">🌙</div>
+    </div>
+
+    <div id="view-input" class="view active glass-card">
+        <h2 style="color: var(--neon-green); margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">Ingestion & Diagnostics</h2>
+        
+        <div class="input-group">
+            <label>1. Device Model Name *</label>
+            <input type="text" placeholder="e.g., MacBook Pro 2017, Broken Coffee Maker">
+        </div>
+
+        <div class="input-group">
+            <label>2. Issues Experienced *</label>
+            <input type="text" placeholder="e.g., Won't turn on, fan makes grinding noise">
+        </div>
+
+        <div class="input-group">
+            <label>3. What Led To It?</label>
+            <input type="text" placeholder="e.g., Dropped in water, drove over it, power surge">
+        </div>
+
+        <div class="input-group">
+            <label>4. Visual Data (Optional)</label>
+            <div class="upload-zone">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg><br>
+                Click to upload images or drop them here
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>5. Repair Consultations (Optional)</label>
+            <input type="text" placeholder="e.g., Local shop said the motherboard is fried">
+        </div>
+
+        <div class="input-group">
+            <label>Tools Available</label>
+            <div class="tools-grid">
+                <div class="tool-chip active">Soldering Iron</div>
+                <div class="tool-chip">Multimeter</div>
+                <div class="tool-chip">3D Printer</div>
+                <div class="tool-chip">Screwdriver Set</div>
+                <div class="tool-chip">Heat Gun</div>
+                <div class="tool-chip">Oscilloscope</div>
+            </div>
+        </div>
+
+        <div class="slider-container input-group">
+            <label>Skill Level: <span id="skill-display" style="color: white; font-weight: normal;">Beginner</span></label>
+            <input type="range" min="1" max="100" value="20" oninput="document.getElementById('skill-display').innerText = this.value > 50 ? 'Engineer' : 'Beginner'">
+            <div class="slider-labels">
+                <span>Beginner</span>
+                <span>Engineer</span>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="runAlgorithm()">
+            Run Combinatorial Algorithm
+        </button>
+    </div>
+
+    <div id="view-loading" class="view loader-container glass-card">
+        <div class="cyber-spinner"></div>
+        <h2 style="color: var(--neon-green);">Analyzing Diagnostics...</h2>
+        <p class="tech-font text-sm">Running combinatorial match algorithm sequence...</p>
+    </div>
+
+    <div id="view-results" class="view">
+        <div class="glass-card">
+            <h2 style="color: var(--neon-green); margin-bottom: 1.5rem;">Component Classification</h2>
+            
+            <div style="margin-bottom: 2rem;">
+                <div class="text-sm tech-font" style="color: var(--danger); margin-bottom: 0.5rem;">IRREPARABLE PARTS</div>
+                <div class="classification-card" style="--border-color: var(--danger);">
+                    <span>Fused Main Board / PCB</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <div class="text-sm tech-font" style="color: var(--warning); margin-bottom: 0.5rem;">REPAIRABLE PARTS</div>
+                <div class="classification-card" style="--border-color: var(--warning);">
+                    <span style="color: var(--text-muted)">No repairs needed.</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-sm tech-font" style="color: var(--neon-green); margin-bottom: 0.5rem;">GOOD PARTS</div>
+                <div class="classification-card" style="--border-color: var(--neon-green);">
+                    <span>RAM Modules</span>
+                    <button class="btn-small" onclick="addToVault('RAM Modules', this)">Add to Vault</button>
+                </div>
+                <div class="classification-card" style="--border-color: var(--neon-green);">
+                    <span>Cooling Fan</span>
+                    <button class="btn-small" onclick="addToVault('Cooling Fan', this)">Add to Vault</button>
+                </div>
+                 <div class="classification-card" style="--border-color: var(--neon-green);">
+                    <span>Wi-Fi Card</span>
+                    <button class="btn-small" onclick="addToVault('Wi-Fi Card', this)">Add to Vault</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button class="btn-small" style="color: var(--text-main); border-color: var(--text-muted);">Copy Results</button>
+                <button class="btn-small" onclick="resetForm()">Start New Triage</button>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 style="color: var(--neon-green); margin-bottom: 1.5rem;">Upcycling Suggestions</h2>
+            <div class="classification-card" style="--border-color: var(--neon-green); display: block;">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Home Server Setup</div>
+                <div class="text-sm">Reuse the RAM and Wi-Fi card in a budget home server or network-attached storage build.</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<button class="vault-fab" onclick="toggleVault()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+    Draft Vault
+    <div class="vault-badge" id="vault-count">2</div>
+</button>
+
+<div class="vault-sidebar" id="vault-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="color: var(--neon-green); margin: 0;">Saved Inventory</h3>
+        <span class="vault-close" onclick="toggleVault()">✕</span>
+    </div>
+    
+    <div class="text-sm" style="margin-bottom: 1.5rem;">Stored from previous salvages for combinatorial logic matching.</div>
+    
+    <div id="vault-items-container" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+        <div class="vault-item"><span>ESP32 Board</span><span style="color: var(--danger); cursor:pointer;">✕</span></div>
+        <div class="vault-item"><span>Moisture Sensor</span><span style="color: var(--danger); cursor:pointer;">✕</span></div>
+    </div>
+
+    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+        <input type="text" id="manual-vault-input" placeholder="Add part manually..." style="padding: 0.5rem;">
+        <button class="btn-small" style="background: var(--neon-green); color: black;" onclick="addManualVaultItem()">Add</button>
+    </div>
+</div>
+
+<script>
+    let vaultCount = 2;
+
+    // View Navigation Logic
+    function runAlgorithm() {
+        document.getElementById('view-input').classList.remove('active');
+        document.getElementById('view-loading').classList.add('active');
+
+        // Simulate processing time
+        setTimeout(() => {
+            document.getElementById('view-loading').classList.remove('active');
+            document.getElementById('view-results').classList.add('active');
+        }, 2000);
+    }
+
+    function resetForm() {
+        document.getElementById('view-results').classList.remove('active');
+        document.getElementById('view-input').classList.add('active');
+    }
+
+    // Vault System Logic
+    function toggleVault() {
+        document.getElementById('vault-panel').classList.toggle('open');
+    }
+
+    function updateVaultBadge() {
+        document.getElementById('vault-count').innerText = vaultCount;
+        // Tiny bounce animation on the badge
+        const badge = document.getElementById('vault-count');
+        badge.style.transform = 'scale(1.3)';
+        setTimeout(() => badge.style.transform = 'scale(1)', 200);
+    }
+
+    function addToVault(itemName, buttonElement) {
+        // Change button state
+        buttonElement.innerText = "Added ✓";
+        buttonElement.style.background = "var(--neon-dim)";
+        buttonElement.disabled = true;
+
+        // Add to sidebar
+        appendVaultItemDOM(itemName);
+        
+        vaultCount++;
+        updateVaultBadge();
+    }
+
+    function addManualVaultItem() {
+        const input = document.getElementById('manual-vault-input');
+        if (input.value.trim() !== '') {
+            appendVaultItemDOM(input.value);
+            vaultCount++;
+            updateVaultBadge();
+            input.value = '';
+        }
+    }
+
+    function appendVaultItemDOM(itemName) {
+        const container = document.getElementById('vault-items-container');
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'vault-item';
+        // Setting up the delete functionality inline
+        itemDiv.innerHTML = <span>${itemName}</span><span style="color: var(--danger); cursor:pointer;" onclick="this.parentElement.remove(); vaultCount--; updateVaultBadge();">✕</span>;
+        container.appendChild(itemDiv);
+    }
+
+    // Tool Chip toggle logic
+    document.querySelectorAll('.tool-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    });
+</script>
+
+</body>
+</html>
